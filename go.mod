@@ -1,4 +1,4 @@
-module github.com/service-register
+module github.com/outreach-golang/service-register
 
 go 1.16
 
