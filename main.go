@@ -2,10 +2,16 @@ package service_register
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
+	"fmt"
 	"github.com/outreach-golang/etcd"
+	uuid "github.com/satori/go.uuid"
+	"math/rand"
 	"os"
+	"strconv"
 	"sync"
+	"time"
 )
 
 var (
@@ -50,6 +56,8 @@ func (s *ServiceRegister) InitServiceRegister(ctx context.Context, sr *etcd.Serv
 			return
 		}
 
+		serviceName = serviceName + "." + getRandomString(12)
+
 		accessAddress := s.nodeIP + ":" + port
 
 		if err := sr.Register(ctx, serviceName, accessAddress, s.lease); err != nil {
@@ -58,4 +66,14 @@ func (s *ServiceRegister) InitServiceRegister(ctx context.Context, sr *etcd.Serv
 	})
 
 	return s.err
+}
+
+func getRandomString(n int) string {
+	s := fmt.Sprintf("%x", sha256.Sum256([]byte(uuid.NewV4().String()+strconv.FormatInt(time.Now().UnixNano(), 10))))
+
+	randBytes := make([]byte, len(s)/2)
+	rand.Read(randBytes)
+	s1 := fmt.Sprintf("%x", randBytes)
+
+	return s[:n-3] + s1[15:18]
 }
