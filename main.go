@@ -43,9 +43,9 @@ func (s *ServiceRegister) InitServiceRegister(ctx context.Context, sr *etcd.Serv
 	port string,
 ) error {
 	s.init.Do(func() {
-		if s.nodeIP == "" {
+		if _, has := os.LookupEnv("NODE_IP"); !has {
 
-			s.err = errors.New("获取 NODE_IP 失败！")
+			s.err = errors.New("环境变量 NODE_IP 获取失败！")
 
 			return
 		}
